@@ -26,15 +26,6 @@ An Android application that captures camera frames, processes them using OpenCV 
 |---------------------|-----------------|
 | ![Edge Mode](docs/screenshots/edge-mode.png) | ![Raw Mode](docs/screenshots/raw-mode.png) |
 
-### Web Viewer
-
-![Web Viewer](docs/screenshots/web-viewer.png)
-
-> **Note:** Screenshots will be added once the app is tested. To add your own screenshots:
-> 1. Take screenshots of the app running on your device
-> 2. Save them in the `docs/screenshots/` directory
-> 3. Update the image paths above to match your file names
-
 ## ⚙️ Setup Instructions
 
 ### Prerequisites
