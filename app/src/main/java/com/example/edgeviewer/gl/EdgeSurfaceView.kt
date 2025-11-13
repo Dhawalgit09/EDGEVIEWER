@@ -9,8 +9,19 @@ class EdgeSurfaceView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : GLSurfaceView(context, attrs) {
 
+    private val renderer = EdgeRenderer()
+
     init {
         setEGLContextClientVersion(2)
+        setRenderer(renderer)
+        renderMode = RENDERMODE_WHEN_DIRTY
+    }
+
+    fun updateFrame(data: ByteArray, width: Int, height: Int) {
+        queueEvent {
+            renderer.updateFrameData(data, width, height)
+            requestRender()
+        }
     }
 }
 

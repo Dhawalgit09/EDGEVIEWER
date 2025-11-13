@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">EdgeViewer</string>
     <string name="frame_stats_placeholder">Waiting for camera…</string>
+    <string name="frame_stats_template">FPS: %.1f\nResolution: %dx%d\nMode: %s</string>
+    <string name="mode_raw">Raw</string>
+    <string name="mode_edges">Edges</string>
 </resources>
