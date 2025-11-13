@@ -48,12 +48,43 @@ An Android application that captures camera frames, processes them using OpenCV 
    - Navigate to the project directory
 
 3. **Configure OpenCV**:
-   - Ensure OpenCV native libraries are in `app/src/main/jniLibs/` for all ABIs:
-     - `arm64-v8a/libopencv_java4.so`
-     - `armeabi-v7a/libopencv_java4.so`
-     - `x86/libopencv_java4.so`
-     - `x86_64/libopencv_java4.so`
-   - Ensure OpenCV headers are in `app/src/main/cpp/include/`
+   - Download OpenCV Android SDK from [opencv.org](https://opencv.org/android/) and extract it
+   - Copy OpenCV native libraries to `app/src/main/jniLibs/` for all ABIs:
+     - From `OpenCV-android-sdk/sdk/native/libs/arm64-v8a/` copy:
+       - `libopencv_java4.so`
+       - `libc++_shared.so` ⚠️ **REQUIRED** - OpenCV depends on this
+     - From `OpenCV-android-sdk/sdk/native/libs/armeabi-v7a/` copy:
+       - `libopencv_java4.so`
+       - `libc++_shared.so`
+     - From `OpenCV-android-sdk/sdk/native/libs/x86/` copy:
+       - `libopencv_java4.so`
+       - `libc++_shared.so`
+     - From `OpenCV-android-sdk/sdk/native/libs/x86_64/` copy:
+       - `libopencv_java4.so`
+       - `libc++_shared.so`
+   - Copy OpenCV headers: From `OpenCV-android-sdk/sdk/native/jni/include/` to `app/src/main/cpp/include/`
+   
+   **Final structure should be:**
+   ```
+   app/src/main/
+   ├── jniLibs/
+   │   ├── arm64-v8a/
+   │   │   ├── libopencv_java4.so
+   │   │   └── libc++_shared.so
+   │   ├── armeabi-v7a/
+   │   │   ├── libopencv_java4.so
+   │   │   └── libc++_shared.so
+   │   ├── x86/
+   │   │   ├── libopencv_java4.so
+   │   │   └── libc++_shared.so
+   │   └── x86_64/
+   │       ├── libopencv_java4.so
+   │       └── libc++_shared.so
+   └── cpp/
+       └── include/
+           └── opencv2/
+               └── ...
+   ```
 
 4. **Sync Gradle**:
    - Click "Sync Project with Gradle Files" in Android Studio
@@ -212,9 +243,25 @@ The web viewer demonstrates the ability to bridge native processing results to a
 ### Web Viewer
 
 1. Open `index.html` in a browser (after building TypeScript)
-2. Click "Load Sample Frame" to display a mock processed frame
-3. Click "Start Mock Stream" to simulate real-time frame updates
-4. View frame statistics in the stats panel
+2. **Load Sample Frame**: Click "Load Sample Frame" to display a mock processed frame
+3. **Load from Base64**: 
+   - Click "Load from Base64" button
+   - Paste a base64-encoded image string (with or without `data:image/...` prefix)
+   - Click "Display Frame" to show it
+4. **Load from File**: Click "Load from File" to upload and display an image file
+5. **Mock Stream**: Click "Start Mock Stream" to simulate real-time frame updates
+6. View frame statistics in the stats panel
+
+**Programmatic Usage**: You can also load frames programmatically from the browser console:
+```javascript
+// Load a base64 frame
+loadEdgeViewerFrame('data:image/png;base64,iVBORw0KGgo...', {
+    width: 640,
+    height: 480,
+    fps: 15.2,
+    mode: 'edges'
+});
+```
 
 ## 📝 Development Notes
 

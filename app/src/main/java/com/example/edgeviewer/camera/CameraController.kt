@@ -1,6 +1,7 @@
 package com.example.edgeviewer.camera
 
 import android.content.Context
+import android.util.Log
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -46,8 +47,10 @@ class CameraController(
                     CameraSelector.DEFAULT_BACK_CAMERA,
                     *useCases.toTypedArray()
                 )
+                Log.d("CameraController", "Camera bound successfully")
                 callback(camera)
             } catch (exception: Exception) {
+                Log.e("CameraController", "Failed to bind camera", exception)
                 callback(null)
             }
         }, ContextCompat.getMainExecutor(context))

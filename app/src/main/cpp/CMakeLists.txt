@@ -5,6 +5,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Use the bundled C++ standard library
+set(CMAKE_CXX_STL c++_shared)
+
 # Help editors find jni.h when ANDROID_NDK is available
 if(DEFINED ANDROID_NDK)
     include_directories("${ANDROID_NDK}/sysroot/usr/include")

@@ -2,7 +2,7 @@
  * Module for displaying processed frames and updating the canvas
  */
 
-import { ProcessedFrame } from './types';
+import { ProcessedFrame, FrameStats } from './types';
 
 export class FrameDisplay {
     private canvas: HTMLCanvasElement;
@@ -24,20 +24,41 @@ export class FrameDisplay {
         }
         this.ctx = context;
         this.statsElement = stats;
+
+        // Initialize canvas with default size and background
+        if (canvas.width === 0 || canvas.height === 0) {
+            canvas.width = 800;
+            canvas.height = 600;
+        }
+        this.ctx.fillStyle = '#000000';
+        this.ctx.fillRect(0, 0, canvas.width, canvas.height);
+        this.ctx.fillStyle = '#ffffff';
+        this.ctx.font = '20px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.fillText('Waiting for frame...', canvas.width / 2, canvas.height / 2);
+        
+        console.log('FrameDisplay initialized with canvas size:', canvas.width, 'x', canvas.height);
     }
 
     /**
      * Display a processed frame with its statistics
      */
     public displayFrame(frame: ProcessedFrame): void {
+        console.log('Displaying frame:', {
+            hasImageData: !!frame.imageData,
+            imageDataLength: frame.imageData?.length,
+            stats: frame.stats
+        });
+
         this.loadImage(frame.imageData)
             .then(img => {
+                console.log('Image loaded successfully:', img.width, 'x', img.height);
                 this.drawImage(img);
                 this.updateStats(frame.stats);
             })
             .catch(err => {
                 console.error('Error displaying frame:', err);
-                this.statsElement.textContent = 'Error loading frame';
+                this.statsElement.textContent = `Error loading frame: ${err.message || 'Unknown error'}`;
             });
     }
 
@@ -61,25 +82,11 @@ export class FrameDisplay {
         const ctx = this.ctx;
 
         // Calculate aspect ratio
-        const imgAspect = img.width / img.height;
-        const canvasAspect = canvas.width / canvas.height;
-
-        let drawWidth: number;
-        let drawHeight: number;
-        let offsetX = 0;
-        let offsetY = 0;
-
-        if (imgAspect > canvasAspect) {
-            // Image is wider than canvas
-            drawHeight = canvas.height;
-            drawWidth = drawHeight * imgAspect;
-            offsetX = (canvas.width - drawWidth) / 2;
-        } else {
-            // Image is taller than canvas
-            drawWidth = canvas.width;
-            drawHeight = drawWidth / imgAspect;
-            offsetY = (canvas.height - drawHeight) / 2;
-        }
+        const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+        const drawWidth = img.width * scale;
+        const drawHeight = img.height * scale;
+        const offsetX = (canvas.width - drawWidth) / 2;
+        const offsetY = (canvas.height - drawHeight) / 2;
 
         // Clear canvas
         ctx.fillStyle = '#000000';

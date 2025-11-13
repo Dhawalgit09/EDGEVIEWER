@@ -3,6 +3,7 @@ package com.example.edgeviewer
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -14,6 +15,8 @@ import com.example.edgeviewer.nativeproc.NativeProcessor
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
+
+    private val TAG = "EdgeViewer"
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var cameraController: CameraController
@@ -46,23 +49,36 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate: Starting EdgeViewer")
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        try {
+            binding = ActivityMainBinding.inflate(layoutInflater)
+            setContentView(binding.root)
+            Log.d(TAG, "onCreate: Layout inflated successfully")
 
-        binding.toggleMode.isEnabled = false
-        binding.frameStats.text = getString(R.string.frame_stats_placeholder)
+            binding.toggleMode.isEnabled = false
+            binding.frameStats.text = getString(R.string.frame_stats_placeholder)
 
-        binding.toggleMode.setOnCheckedChangeListener { _, _ ->
-            renderLatestFrame()
+            binding.toggleMode.setOnCheckedChangeListener { _, _ ->
+                renderLatestFrame()
+            }
+
+            try {
+                NativeProcessor.setEdgeParameters(
+                    lowThreshold = 60.0,
+                    highThreshold = 180.0,
+                    blurRadius = 5,
+                    equalizeHistogram = true
+                )
+                Log.d(TAG, "onCreate: Native processor initialized")
+            } catch (e: Exception) {
+                Log.e(TAG, "onCreate: Failed to initialize native processor", e)
+                binding.frameStats.text = "Error: Native library not loaded. Check logcat."
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "onCreate: Fatal error", e)
+            throw e
         }
-
-        NativeProcessor.setEdgeParameters(
-            lowThreshold = 60.0,
-            highThreshold = 180.0,
-            blurRadius = 5,
-            equalizeHistogram = true
-        )
     }
 
     override fun onResume() {
@@ -92,21 +108,35 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startCamera() {
-        if (!::cameraController.isInitialized) {
-            cameraController = CameraController(this, this, cameraExecutor)
-        }
-        if (frameAnalyzer == null) {
-            frameAnalyzer = FrameAnalyzer { frame ->
-                handleFrame(frame)
+        Log.d(TAG, "startCamera: Attempting to start camera")
+        try {
+            if (!::cameraController.isInitialized) {
+                cameraController = CameraController(this, this, cameraExecutor)
+                Log.d(TAG, "startCamera: CameraController created")
             }
-        }
-        cameraController.bindCameraAsync(
-            previewSurfaceProvider = null,
-            analyzer = frameAnalyzer!!
-        ) { camera ->
-            runOnUiThread {
-                binding.toggleMode.isEnabled = camera != null
+            if (frameAnalyzer == null) {
+                frameAnalyzer = FrameAnalyzer { frame ->
+                    handleFrame(frame)
+                }
+                Log.d(TAG, "startCamera: FrameAnalyzer created")
             }
+            cameraController.bindCameraAsync(
+                previewSurfaceProvider = null,
+                analyzer = frameAnalyzer!!
+            ) { camera ->
+                runOnUiThread {
+                    if (camera != null) {
+                        Log.d(TAG, "startCamera: Camera bound successfully")
+                        binding.toggleMode.isEnabled = true
+                    } else {
+                        Log.e(TAG, "startCamera: Failed to bind camera")
+                        binding.frameStats.text = "Error: Camera initialization failed. Check logcat."
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "startCamera: Exception", e)
+            binding.frameStats.text = "Error: ${e.message}"
         }
     }
 
