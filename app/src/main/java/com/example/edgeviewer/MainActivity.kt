@@ -10,6 +10,7 @@ import com.example.edgeviewer.databinding.ActivityMainBinding
 import com.example.edgeviewer.camera.CameraController
 import com.example.edgeviewer.camera.FrameAnalyzer
 import com.example.edgeviewer.camera.ProcessedFrame
+import com.example.edgeviewer.nativeproc.NativeProcessor
 import java.util.concurrent.Executors
 
 class MainActivity : AppCompatActivity() {
@@ -55,6 +56,13 @@ class MainActivity : AppCompatActivity() {
         binding.toggleMode.setOnCheckedChangeListener { _, _ ->
             renderLatestFrame()
         }
+
+        NativeProcessor.setEdgeParameters(
+            lowThreshold = 60.0,
+            highThreshold = 180.0,
+            blurRadius = 5,
+            equalizeHistogram = true
+        )
     }
 
     override fun onResume() {
