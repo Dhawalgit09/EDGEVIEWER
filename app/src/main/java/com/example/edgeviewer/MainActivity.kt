@@ -1,8 +1,8 @@
 package com.example.edgeviewer
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import com.example.edgeviewer.R
 import com.example.edgeviewer.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -15,20 +15,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Example of a call to a native method
-        binding.sampleText.text = stringFromJNI()
-    }
-
-    /**
-     * A native method that is implemented by the 'edgeviewer' native library,
-     * which is packaged with this application.
-     */
-    external fun stringFromJNI(): String
-
-    companion object {
-        // Used to load the 'edgeviewer' library on application startup.
-        init {
-            System.loadLibrary("edgeviewer")
-        }
+        binding.toggleMode.isEnabled = false
+        binding.frameStats.text = getString(R.string.frame_stats_placeholder)
     }
 }

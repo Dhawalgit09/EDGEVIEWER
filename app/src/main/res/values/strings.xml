@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">EdgeViewer</string>
+    <string name="frame_stats_placeholder">Waiting for camera…</string>
 </resources>
