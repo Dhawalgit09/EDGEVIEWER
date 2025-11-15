@@ -26,6 +26,12 @@ An Android application that captures camera frames, processes them using OpenCV 
 |---------------------|-----------------|
 | ![Edge Mode](docs/screenshots/edge-mode.png) | ![Raw Mode](docs/screenshots/raw-mode.png) |
 
+### Web Viewer
+
+![Web Viewer](docs/screenshots/web-viewer.png)
+
+*The web viewer displays processed frames with dynamically updated statistics (FPS and Resolution) controlled by TypeScript code.*
+
 ## ⚙️ Setup Instructions
 
 ### Prerequisites
@@ -246,26 +252,35 @@ The web viewer demonstrates the ability to bridge native processing results to a
 
 ### Web Viewer
 
-1. Open `index.html` in a browser (after building TypeScript)
-2. **Load Sample Frame**: Click "Load Sample Frame" to display a mock processed frame
-3. **Load from Base64**: 
-   - Click "Load from Base64" button
-   - Paste a base64-encoded image string (with or without `data:image/...` prefix)
-   - Click "Display Frame" to show it
-4. **Load from File**: Click "Load from File" to upload and display an image file
-5. **Mock Stream**: Click "Start Mock Stream" to simulate real-time frame updates
-6. View frame statistics in the stats panel
+1. **Navigate to web directory**:
+   ```bash
+   cd web
+   ```
 
-**Programmatic Usage**: You can also load frames programmatically from the browser console:
-```javascript
-// Load a base64 frame
-loadEdgeViewerFrame('data:image/png;base64,iVBORw0KGgo...', {
-    width: 640,
-    height: 480,
-    fps: 15.2,
-    mode: 'edges'
-});
-```
+2. **Build TypeScript**:
+   ```bash
+   npm install
+   npm run build
+   ```
+
+3. **Serve the application**:
+   ```bash
+   npm run serve
+   ```
+   This will open `http://localhost:8080` in your browser automatically.
+
+4. **Using the Web Viewer**:
+   - The page automatically loads a sample processed frame on startup
+   - **Load Sample Frame**: Click to reload the sample edge-detected frame
+   - **Start Mock Stream**: Click to simulate real-time frame updates
+   - **Frame Statistics**: Displays FPS and Resolution (updated dynamically by TypeScript)
+   - The canvas displays the processed frame with proper aspect ratio
+
+**Features**:
+- Displays static sample processed frame (from `sample_frame.png`)
+- Shows frame statistics (FPS, Resolution) updated by TypeScript code
+- Canvas-based rendering (not just `<img>` tag)
+- Modular TypeScript architecture
 
 ## 📝 Development Notes
 

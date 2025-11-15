@@ -2,32 +2,65 @@
  * Module for loading frame data (from static file or mock data)
  */
 
-import { ProcessedFrame } from './types';
+import { ProcessedFrame } from './types.js';
 
 export class FrameLoader {
     /**
      * Load a sample processed frame from a static image file
-     * In a real implementation, this could fetch from an HTTP endpoint or WebSocket
+     * Loads the actual edge-detected frame from Android app
      */
     public static async loadSampleFrame(): Promise<ProcessedFrame> {
+        console.log('loadSampleFrame: Starting to load frame...');
+    
         return new Promise((resolve) => {
-            const placeholderImage = FrameLoader.createPlaceholderImage();
-
-            const mockFrame: ProcessedFrame = {
-                imageData: placeholderImage,
-                stats: {
-                    fps: 15.2,
-                    width: 640,
-                    height: 480,
-                    mode: 'edges',
-                    timestamp: Date.now()
-                }
+            const img = new Image();
+            let resolved = false;
+    
+            img.onload = () => {
+                if (resolved) return;
+                resolved = true;
+    
+                console.log('Image file loaded successfully:', img.width, 'x', img.height);
+    
+                const frame: ProcessedFrame = {
+                    // just use the file path directly
+                    imageData: 'sample_frame.png',
+                    stats: {
+                        fps: 12.5,
+                        width: img.width,
+                        height: img.height,
+                        mode: 'edges',
+                        timestamp: Date.now()
+                    }
+                };
+    
+                resolve(frame);
             };
-
-            setTimeout(() => resolve(mockFrame), 120);
+    
+            img.onerror = (error) => {
+                if (resolved) return;
+                resolved = true;
+                console.error('Failed to load sample_frame.png, using placeholder', error);
+    
+                const placeholderImage = FrameLoader.createPlaceholderImage();
+                const mockFrame: ProcessedFrame = {
+                    imageData: placeholderImage,
+                    stats: {
+                        fps: 12.5,
+                        width: 640,
+                        height: 480,
+                        mode: 'edges',
+                        timestamp: Date.now()
+                    }
+                };
+                resolve(mockFrame);
+            };
+    
+            console.log('Attempting to load sample_frame.png...');
+            img.src = 'sample_frame.png';  // make sure this file sits next to index.html
         });
     }
-
+    
     /**
      * Load frame from base64 string (for when Android app sends data)
      */
@@ -76,41 +109,49 @@ export class FrameLoader {
         const ctx = canvas.getContext('2d');
 
         if (!ctx) {
+            console.error('Could not get canvas context');
             return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
         }
 
-        const gradient = ctx.createLinearGradient(0, 0, width, height);
-        gradient.addColorStop(0, '#1f2937');
-        gradient.addColorStop(0.5, '#3b82f6');
-        gradient.addColorStop(1, '#10b981');
-        ctx.fillStyle = gradient;
+        // Create a sample processed frame that looks like edge detection
+        // Black background (typical for edge detection output)
+        ctx.fillStyle = '#000000';
         ctx.fillRect(0, 0, width, height);
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.lineWidth = 4;
-        ctx.strokeRect(40, 30, width - 80, height - 60);
+        // Draw green edges (simulating Canny edge detection output)
+        ctx.strokeStyle = '#00FF00'; // Green edges
+        ctx.lineWidth = 2;
 
-        ctx.setLineDash([10, 6]);
-        ctx.strokeStyle = 'rgba(255,255,255,0.35)';
-        ctx.strokeRect(80, 70, width - 160, height - 140);
-        ctx.setLineDash([]);
-
-        ctx.strokeStyle = '#22d3ee';
-        ctx.lineWidth = 3;
+        // Draw some sample edge patterns
         ctx.beginPath();
-        for (let x = 80; x <= width - 80; x += 40) {
-            const y = height / 2 + Math.sin(x / 40) * 60;
-            ctx.lineTo(x, y);
+        // Horizontal lines
+        for (let y = 50; y < height - 50; y += 30) {
+            ctx.moveTo(50, y);
+            ctx.lineTo(width - 50, y);
+        }
+        // Vertical lines
+        for (let x = 50; x < width - 50; x += 30) {
+            ctx.moveTo(x, 50);
+            ctx.lineTo(x, height - 50);
+        }
+        // Diagonal pattern
+        for (let i = 0; i < 10; i++) {
+            ctx.moveTo(100 + i * 50, 100);
+            ctx.lineTo(150 + i * 50, height - 100);
         }
         ctx.stroke();
 
-        ctx.fillStyle = '#facc15';
-        ctx.font = 'bold 36px "Segoe UI", sans-serif';
-        ctx.fillText('EdgeViewer Sample Frame', 90, height / 2 - 40);
-        ctx.font = '24px "Segoe UI", sans-serif';
-        ctx.fillText('Mock processed frame for web viewer', 90, height / 2 + 10);
+        // Add text overlay showing it's a sample frame
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = 'bold 24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Sample Processed Frame', width / 2, height / 2 - 20);
+        ctx.font = '16px Arial';
+        ctx.fillText('Edge Detection Output (640x480)', width / 2, height / 2 + 10);
 
-        return canvas.toDataURL('image/png');
+        const dataUrl = canvas.toDataURL('image/png');
+        console.log('Created placeholder image:', dataUrl.substring(0, 50) + '...');
+        return dataUrl;
     }
 }
 

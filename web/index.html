@@ -65,6 +65,8 @@
             height: auto;
             border: 2px solid #667eea;
             border-radius: 4px;
+            display: block;
+            background: #000000;
         }
 
         .controls {
@@ -244,34 +246,14 @@
             <div class="controls">
                 <button id="load-frame-btn">Load Sample Frame</button>
                 <button id="mock-stream-btn">Start Mock Stream</button>
-                <button id="load-base64-btn">Load from Base64</button>
-                <input type="file" id="file-input" accept="image/*" style="display: none;">
-                <button id="load-file-btn">Load from File</button>
-            </div>
-
-            <div class="base64-input-container" id="base64-container" style="display: none;">
-                <h3>Paste Base64 Image Data</h3>
-                <textarea id="base64-input" placeholder="Paste base64 string here (with or without data:image/ prefix)"></textarea>
-                <div class="base64-buttons">
-                    <button id="submit-base64-btn">Display Frame</button>
-                    <button id="cancel-base64-btn">Cancel</button>
-                </div>
             </div>
 
             <div class="stats-container">
                 <h2>Frame Statistics</h2>
                 <div id="frame-stats">
+                    <!-- Stats will be populated dynamically by TypeScript -->
                     <div class="stat-item">
-                        <strong>FPS:</strong> --
-                    </div>
-                    <div class="stat-item">
-                        <strong>Resolution:</strong> --
-                    </div>
-                    <div class="stat-item">
-                        <strong>Mode:</strong> --
-                    </div>
-                    <div class="stat-item">
-                        <strong>Timestamp:</strong> --
+                        <strong>Loading...</strong>
                     </div>
                 </div>
             </div>
@@ -283,7 +265,7 @@
         </div>
     </div>
 
-    <script type="module" src="dist/main.js"></script>
+    <script type="module" src="./dist/main.js"></script>
 </body>
 </html>
 
